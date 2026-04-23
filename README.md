@@ -36,7 +36,12 @@ Salida en Texto (Transcripción)
 
 ## Autor
 Marcos Bautista
-Proyecto personal
+
+
+(Pomgan sus nombres)
+
+---
+
 Maestria en Investigacion en ciencia de Datos 
 BUAP
 
