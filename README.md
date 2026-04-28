@@ -64,4 +64,12 @@ despues podrás instalar las paqueterías necesarias
 ```
 pip install -r requirements.txt
 ```
+Para usar el env que acabamos de crear antes de correr el codigo debes de activarlo de la siguiente manera
+```
+source .LSM/bin/activate
+```
+Para desactivarlo basta con escribir
+```
+deactivate
+```
 Estas ready para empezar a usar el código.
