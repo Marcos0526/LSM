@@ -46,7 +46,30 @@ Maestria en Investigacion en ciencia de Datos
 BUAP
 
 ## Instalación
-Para empezar clona el repositorio en una carpeta
+El primer paso es tener un ambiente en nuestra computadora, qué es un ambiente te preguntarás, 
+bueno imagina que en tu computadora tienes python 3.14, ahi todo corre muy bien
+tienes todos tus archivos y todo funciona a la perfección, después de un año actualizas a python a 3.15, creas nuevos codigos usando python 3.15 y derrepente quieres correr un código viejo pero te encuentras con la sorpresa de que no funciona, que no es compatible, una solución es cambiarte nuevamente a python 3.14 pero ahora tus nuevos codigos que creaste con python 3.15 ya no funcionan.
+
+La solución es crear un ambiente, los ambientes son como minicomputadoras dentro de tu computadora, imagina que tienes dos ambientes en uno instalamos python3.14 y en el otro 3.15, y en cada uno tenemos instalado numpy pero en uno esta la version de numpy que soporta python 3.14 y en el otro numpy 3.15, ahi el codigo funciona a la perfeccion.
+Bueno, sólo hay que saber en que minicomputadora (ambiente) debemos de correr nuestro codigo.
+
+Una herramienta que nos ayuda a crear estos ambiente es Conda, así que procederemos a instalarla en nuestra compu, todos los siguientes pasos se harán dentro de la terminal.
+
+```
+curl -LO https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+```
+
+```
+bash Miniconda3-latest-Linux-x86_64.sh
+```
+
+Aceptas licencia
+Ruta por defecto (~/miniconda3)
+Cuando pregunte: yes para inicializar
+
+recuerda actualizar tu terminal, cerrarla y abrir una nueva también sirve
+
+Ahora puedes clonar el repositorio en una carpeta o si ya lo hiciste no pasa nada
 
 ```
 git clone git@github.com:Marcos0526/LSM.git
@@ -54,22 +77,29 @@ git clone git@github.com:Marcos0526/LSM.git
 Ya tienes que tener SSH en tu computadora y git
 
 Ahora verifica que tienes la versión más reciente del repositorio donde no aparece la carpeta LSM
-como segundo paso en la terminal en la carpeta del repositorio ejecuta
-```
-python3  -m venv .LSM
-```
 
-despues podrás instalar las paqueterías necesarias
+ya en los archivos del repositorio clonado verás un archivo llamado environment.yml aquí estan todas las cosas que necesitamos
+para poder correr el codigo, las paqueterias junto con sus versiones, procedemos a instalarlas
 
 ```
-pip install -r requirements.txt
+conda env create -f environment.yml
 ```
+
 Para usar el env que acabamos de crear antes de correr el codigo debes de activarlo de la siguiente manera
 ```
-source .LSM/bin/activate
+conda activate LSM
 ```
+
+Ahora ya puedes correr el codigo
+
 Para desactivarlo basta con escribir
 ```
-deactivate
+conda deactivate
 ```
 Estas ready para empezar a usar el código.
+
+Si algún día deseas desinstalar el ambeinte, porque ocupa espacio puedes hacer 
+```
+conda remove -n LSM --all
+```
+recuerda que siempre podrás recuperarlo gracias a environment.yml
