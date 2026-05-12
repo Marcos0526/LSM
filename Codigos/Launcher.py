@@ -160,7 +160,11 @@ def run_script(entry: dict):
 
 
 # ── Ver dataset
-DATASET_DIR = Path("/home/marcos/LSM/Dataset")   
+ruta_archivo_actual = os.path.abspath(__file__)
+carpeta_actual = os.path.dirname(ruta_archivo_actual)
+carpeta_padre = os.path.dirname(carpeta_actual)
+ruta_dataset = os.path.join(carpeta_padre, "Dataset")
+DATASET_DIR = Path(ruta_dataset)
 
 def show_dataset_stats():
     clear()

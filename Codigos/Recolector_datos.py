@@ -20,14 +20,18 @@ import csv
 import os
 import time
 
-# ── Rutas
-BASE_DIR      = "/home/marcos/LSM/Dataset"
-STATIC_CSV    = os.path.join(BASE_DIR, "hand_landmarks_static.csv")
-MOTION_CSV    = os.path.join(BASE_DIR, "hand_landmarks_motion.csv")
-SEQ_DIR       = os.path.join(BASE_DIR, "sequences")   # carpeta para .npy
-os.makedirs(SEQ_DIR, exist_ok=True)
 
-RECORD_FPS    = 10
+# ── Rutas
+BASE_DIR     = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # → LSM/
+DATASET_PATH = os.path.join(BASE_DIR, "Dataset")                            # → LSM/Dataset/
+SEQ_DIR      = os.path.join(DATASET_PATH, "sequences")                      # → LSM/Dataset/sequences/
+STATIC_CSV   = os.path.join(DATASET_PATH, "hand_landmarks_static.csv")
+MOTION_CSV   = os.path.join(DATASET_PATH, "hand_landmarks_motion.csv")
+
+os.makedirs(DATASET_PATH, exist_ok=True)  
+os.makedirs(SEQ_DIR, exist_ok=True)      
+
+RECORD_FPS    = 1
 RECORD_DELAY  = 1.0 / RECORD_FPS
 
 # ── Normalización 
