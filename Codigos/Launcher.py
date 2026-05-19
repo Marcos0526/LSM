@@ -74,6 +74,14 @@ SCRIPTS = [
         "args":  [],
         "color": g2,
     },
+    {
+        "key":   "3",
+        "name":  "Recolectar dataset full",
+        "file":  "Recolector_datos_full.py",
+        "desc":  "Graba y etiqueta señas → hand_landmarks_dataset.csv",
+        "args":  [],
+        "color": g2,
+    },
 
 ]
 
