@@ -46,6 +46,13 @@ def extract_keypoints(results):
     lh = np.array([[res.x, res.y, res.z] for res in results.left_hand_landmarks.landmark]) if results.left_hand_landmarks else np.zeros((21, 3))
     rh = np.array([[res.x, res.y, res.z] for res in results.right_hand_landmarks.landmark]) if results.right_hand_landmarks else np.zeros((21, 3))
     
+    if results.face_landmarks:
+        lips = np.array([
+            [results.face_landmarks.landmark[13].x, results.face_landmarks.landmark[13].y, results.face_landmarks.landmark[13].z],
+            [results.face_landmarks.landmark[14].x, results.face_landmarks.landmark[14].y, results.face_landmarks.landmark[14].z]
+        ])
+    else:
+        lips = np.zeros((2, 3))
     return np.concatenate([pose, lh, rh])
 
 def normalize_landmarks(keypoints):
@@ -74,7 +81,7 @@ def normalize_landmarks(keypoints):
     return lm
 
 # ── Manejo de Archivos CSV Estáticos (225 columnas de datos)
-STATIC_HEADER = ["label"] + [f"node_{i}_{ax}" for i in range(75) for ax in ("x", "y", "z")]
+STATIC_HEADER = ["label"] + [f"node_{i}_{ax}" for i in range(77) for ax in ("x", "y", "z")]
 
 def init_static_csv():
     if not os.path.exists(STATIC_CSV):
@@ -175,7 +182,9 @@ def main():
         mp_drawing.draw_landmarks(frame, results.pose_landmarks, mp_holistic.POSE_CONNECTIONS)
         mp_drawing.draw_landmarks(frame, results.left_hand_landmarks, mp_holistic.HAND_CONNECTIONS)
         mp_drawing.draw_landmarks(frame, results.right_hand_landmarks, mp_holistic.HAND_CONNECTIONS)
-
+        mp_drawing.draw_landmarks(frame, results.face_landmarks, mp.solutions.face_mesh.FACEMESH_LIPS, 
+                                    mp_drawing.DrawingSpec(color=(80,110,10), thickness=1, circle_radius=1),
+                                    mp_drawing.DrawingSpec(color=(80,256,121), thickness=1, circle_radius=1))
         # Captura y lógica de grabación
         if results.pose_landmarks or results.left_hand_landmarks or results.right_hand_landmarks:
             raw_keypoints = extract_keypoints(results)
