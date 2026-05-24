@@ -72,76 +72,60 @@ def validation(model, test_loader, epoch, save_to):
     all_video_ids = []
     all_pool_out = []
 
-    num_copies = 4
-
     with torch.no_grad():
         for batch_idx, data in enumerate(test_loader):
             # distribute data to device
             X, y, video_ids = data
             X, y = X.cuda(), y.cuda().view(-1, )
 
-            all_output = []
+            # Procesamos el batch completo directamente
+            output = model(X)
 
-            stride = X.size()[2] // num_copies
-
-            for i in range(num_copies):
-                X_slice = X[:, :, i * stride: (i+1) * stride]
-                output = model(X_slice)
-                all_output.append(output)
-
-            all_output = torch.stack(all_output, dim=1)
-            output = torch.mean(all_output, dim=1)
-
-            # output = model(X)  # output has dim = (batch, number of classes)
-
-            # loss = F.cross_entropy(pool_out, y, reduction='sum')
+            # calcular pérdida
             loss = compute_loss(output, y)
+            val_loss.append(loss.item())
 
-            val_loss.append(loss.item())  # sum up batch loss
-            y_pred = output.max(1, keepdim=True)[1]  # (y_pred != output) get the index of the max log-probability
+            # obtener predicción (índice de la probabilidad máxima)
+            y_pred = output.max(1, keepdim=True)[1]
 
-            # collect all y and y_pred in all batches
+            # recolectar resultados
             all_y.extend(y)
             all_y_pred.extend(y_pred)
             all_video_ids.extend(video_ids)
             all_pool_out.extend(output)
 
-    # this computes the average loss on the BATCH
+    # calcular pérdida promedio
     val_loss = sum(val_loss) / len(val_loss)
 
-    # compute accuracy
+    # convertir a tensores y luego a numpy
     all_y = torch.stack(all_y, dim=0)
     all_y_pred = torch.stack(all_y_pred, dim=0).squeeze()
     all_pool_out = torch.stack(all_pool_out, dim=0).cpu().data.numpy()
 
-    # log down incorrectly labelled instances
+    # identificar muestras mal clasificadas
     incorrect_indices = torch.nonzero(all_y - all_y_pred).squeeze().data
-    incorrect_video_ids = [(vid, int(all_y_pred[i].data)) for i, vid in enumerate(all_video_ids) if
-                           i in incorrect_indices]
+    
+    # Manejo de caso si solo hay un elemento incorrecto
+    if incorrect_indices.dim() == 0:
+        incorrect_indices = incorrect_indices.unsqueeze(0)
+        
+    incorrect_video_ids = [(all_video_ids[i], int(all_y_pred[i].data)) for i in incorrect_indices]
 
     all_y = all_y.cpu().data.numpy()
     all_y_pred = all_y_pred.cpu().data.numpy()
 
-    # top-k accuracy
+    # calcular exactitud top-k
     top1acc = accuracy_score(all_y, all_y_pred)
     top3acc = compute_top_n_accuracy(all_y, all_pool_out, 3)
     top5acc = compute_top_n_accuracy(all_y, all_pool_out, 5)
     top10acc = compute_top_n_accuracy(all_y, all_pool_out, 10)
     top30acc = compute_top_n_accuracy(all_y, all_pool_out, 30)
 
-    # show information
-    print('\nVal. set ({:d} samples): Average loss: {:.4f}, Accuracy: {:.2f}%\n'.format(len(all_y), val_loss,
-                                                                                        100 * top1acc))
-
-    if save_to:
-        # save Pytorch models of best record
-        torch.save(model.state_dict(),
-                   os.path.join(save_to, 'gcn_epoch{}.pth'.format(epoch + 1)))  # save spatial_encoder
-        print("Epoch {} model saved!".format(epoch + 1))
+    # imprimir información
+    print('\nVal. set ({:d} samples): Average loss: {:.4f}, Accuracy: {:.2f}%\n'.format(
+        len(all_y), val_loss, 100 * top1acc))
 
     return val_loss, [top1acc, top3acc, top5acc, top10acc, top30acc], all_y.tolist(), all_y_pred.tolist(), incorrect_video_ids
-
-
 def compute_loss(out, gt):
     ce_loss = F.cross_entropy(out, gt)
 
