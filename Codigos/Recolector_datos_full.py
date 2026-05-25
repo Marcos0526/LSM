@@ -226,19 +226,23 @@ def main():
                             static_session_count = 0    
 
                 else: # Modo Movimiento
-                    elapsed = now - motion_start_time
-
+                    # Añadir frame respetando el intervalo para que no se grabe demasiado rápido
                     if (now - last_motion_sample) >= MOTION_SAMPLE_INTERVAL:
                         motion_buffer.append(norm_mat)
                         last_motion_sample = now
 
-                    # Detener y guardar al alcanzar objetivo
-                    if len(motion_buffer) >= MOTION_FRAMES_TARGET or elapsed >= MOTION_DURATION_SEC:
-                        save_motion(current_label, motion_buffer)
+                    # EL CAMBIO CRUCIAL: Detener SOLO cuando tengamos la cantidad exacta de frames
+                    if len(motion_buffer) >= MOTION_FRAMES_TARGET:
+                        
+                        # Cortafuegos extra: Aseguramos que sea exactamente la cantidad pedida
+                        # por si un hilo de procesamiento metió un frame de más
+                        buffer_exacto = motion_buffer[:MOTION_FRAMES_TARGET]
+                        
+                        save_motion(current_label, buffer_exacto)
                         session_count += 1
                         recording      = False  
                         
-                        # Reiniciar ciclo
+                        # Reiniciar ciclo para la siguiente toma
                         is_counting_down = True
                         countdown_start  = time.time()
 
