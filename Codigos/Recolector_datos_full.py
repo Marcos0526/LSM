@@ -47,6 +47,33 @@ LEFT_EYEBROW_IDS  = [70, 63, 105, 66]
 RIGHT_EYEBROW_IDS = [300, 293, 334, 296]
 MOUTH_IDS         = [13, 14, 61, 291] # Apertura + Comisuras
 
+def save_motion(label, frames_list):
+    if len(frames_list) == 0: return
+    
+    # 1. Crear la ruta de la subcarpeta basada en la etiqueta
+    # Esto creará algo como: /ruta/a/Dataset/sequences/hola
+    label_dir = os.path.join(SEQ_DIR, label)
+    
+    # 2. Crear el directorio si no existe
+    os.makedirs(label_dir, exist_ok=True)
+    
+    # 3. Generar el nombre del archivo
+    ts       = time.strftime("%Y%m%d_%H%M%S") + f"_{int(time.time()*1000)%1000:03d}"
+    filename = f"{label}_{ts}.npy"
+    
+    # 4. Unir la ruta de la subcarpeta con el nombre del archivo
+    npy_path = os.path.join(label_dir, filename)
+
+    # 5. Guardar el tensor
+    seq = np.array(frames_list, dtype=np.float32)
+    np.save(npy_path, seq)
+
+    # 6. Actualizar el CSV de registro (opcional, pero útil para llevar el control)
+    with open(MOTION_CSV, "a", newline="") as f:
+        csv.writer(f).writerow([label, npy_path, len(frames_list)])
+        
+    print(f"[SAVE] '{label}' guardada en carpeta '{label}': {len(frames_list)} frames.")
+
 # ── Extracción y Normalización
 def extract_keypoints(results):
     """
@@ -111,19 +138,6 @@ def init_csvs():
 def save_static(label, vector_mat):
     with open(STATIC_CSV, "a", newline="") as f:
         csv.writer(f).writerow([label] + vector_mat.flatten().tolist())
-
-def save_motion(label, frames_list):
-    if len(frames_list) == 0: return
-    ts       = time.strftime("%Y%m%d_%H%M%S") + f"_{int(time.time()*1000)%1000:03d}"
-    filename = f"{label}_{ts}.npy"
-    npy_path = os.path.join(SEQ_DIR, filename)
-
-    seq = np.array(frames_list, dtype=np.float32)
-    np.save(npy_path, seq)
-
-    with open(MOTION_CSV, "a", newline="") as f:
-        csv.writer(f).writerow([label, npy_path, len(frames_list)])
-    print(f"[SAVE] '{label}' guardada: {len(frames_list)} frames.")
 
 # ── Interfaz de Etiqueta
 def capture_label(current_label):

@@ -16,7 +16,16 @@ class MiDatasetLSM(Dataset):
         self.is_train = is_train
 
         # 1. Obtener todos los archivos .npy
-        archivos_en_carpeta = [f for f in os.listdir(root_dir) if f.endswith('.npy')]
+        # 1. Obtener todos los archivos .npy de forma recursiva buscando en las subcarpetas
+        # Usamos os.walk para entrar en 'hola', 'adios', 'a', 'b', etc.
+        archivos_en_carpeta = []
+        for root, dirs, files in os.walk(root_dir):
+            for file in files:
+                if file.endswith('.npy'):
+                    # Guardamos la ruta relativa desde root_dir para extraer bien el nombre
+                    ruta_completa = os.path.join(root, file)
+                    ruta_relativa = os.path.relpath(ruta_completa, root_dir)
+                    archivos_en_carpeta.append(ruta_relativa)
         
         # 2. Identificar las clases (Toma la primera letra)
         clases_unicas = sorted(list(set([f[0].lower() for f in archivos_en_carpeta])))
