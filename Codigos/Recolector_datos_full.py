@@ -275,9 +275,11 @@ def main():
             elapsed_disp = time.time() - motion_start_time
             texto_segundos = f"Grabando: {int(elapsed_disp)}s / {int(MOTION_DURATION_SEC)}s"
             
-            # Dibujar arriba al centro
             tsize = cv2.getTextSize(texto_segundos, font, 1.0, 3)[0]
-            cv2.putText(frame, texto_segundos, ((w - tsize[0]) // 2, 50), font, 1.0, (50, 50, 255), 3)
+            pos_x = (w - tsize[0]) // 2
+            # Sombra y Texto principal (arriba al centro)
+            cv2.putText(frame, texto_segundos, (pos_x + 2, 52), font, 1.0, (0, 0, 0), 3) 
+            cv2.putText(frame, texto_segundos, (pos_x, 50), font, 1.0, (50, 50, 255), 3) 
             
             # Mantener contador de frames a la derecha
             cv2.putText(frame, f"Frames: {len(motion_buffer)}/{MOTION_FRAMES_TARGET}", 
@@ -287,14 +289,28 @@ def main():
         if mode == "estatico" and recording:
             cv2.putText(frame, f"Instancias: {static_session_count}/{MAX_STATIC_SAMPLES}", (w - 230, 55), font, 0.6, (60, 220, 100), 2)  
 
-        # Etiqueta y Guardados
-        lbl_color = (60, 220, 100) if current_label else (30, 210, 230)
-        cv2.putText(frame, f"Sena: {current_label or 'sin etiqueta'}", (10, h - 15), font, 0.85, lbl_color, 2)
-        cv2.putText(frame, f"Guardados: {session_count}", (10, 58), font, 0.6, (200, 200, 200), 1)
 
-        # Controles
-        for i, ctrl in enumerate(["[L] Etiqueta", "[M] Modo", "[R] Iniciar/Stop", "[ESC] Salir"]):
-            cv2.putText(frame, ctrl, (10, 88 + i * 22), font, 0.48, (140, 140, 140), 1)
+        # --- ETIQUETAS, GUARDADOS Y CONTROLES (Con borde negro para alto contraste) ---
+        
+        # Función auxiliar rápida para dibujar texto con contorno (outline)
+        def draw_text_with_outline(img, text, pos, font, scale, color, thickness):
+            # Dibuja el borde (más grueso y en negro)
+            cv2.putText(img, text, pos, font, scale, (0, 0, 0), thickness + 2, cv2.LINE_AA)
+            # Dibuja el relleno (color original)
+            cv2.putText(img, text, pos, font, scale, color, thickness, cv2.LINE_AA)
+
+        # Etiqueta
+        lbl_color = (60, 220, 100) if current_label else (30, 210, 230)
+        draw_text_with_outline(frame, f"Sena: {current_label or 'sin etiqueta'}", (10, h - 15), font, 0.85, lbl_color, 2)
+
+        # Guardados (En color rojo puro: BGR 0,0,255)
+        draw_text_with_outline(frame, f"Guardados: {session_count}", (10, h - 50), font, 0.65, (0, 0, 255), 2)
+
+        # Controles (Blanco brillante con borde negro fuerte para máxima lectura)
+        controles = ["[L] Etiqueta", "[M] Modo", "[R] Iniciar/Stop", "[ESC] Salir"]
+        for i, ctrl in enumerate(controles):
+            draw_text_with_outline(frame, ctrl, (10, 85 + i * 25), font, 0.55, (255, 255, 255), 1)
+
 
         cv2.imshow("Recolector Full", frame)
 
