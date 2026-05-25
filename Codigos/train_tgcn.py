@@ -22,24 +22,28 @@ def run(pose_data_root, configs):
     num_stages = configs.num_stages
 
     # --- PARÁMETROS CLAVE ---
-    n_nodes = 83  
+    n_nodes = 79
     n_dims = 3    
 
     # setup dataset (Entrenamiento)
     train_dataset = MiDatasetLSM(root_dir=os.path.join(pose_data_root, 'train'), 
                                  num_samples=num_samples, 
                                  num_nodes=n_nodes, 
-                                 num_dims=n_dims)
+                                 num_dims=n_dims,
+                                 num_variations= 20)
 
     train_data_loader = torch.utils.data.DataLoader(dataset=train_dataset, 
                                                     batch_size=configs.batch_size,
-                                                    shuffle=True)
+                                                    shuffle=True,
+                                                    num_workers=4,
+                                                    pin_memory=True)
 
     # setup dataset (Validación)
     val_dataset = MiDatasetLSM(root_dir=os.path.join(pose_data_root, 'val'), 
                                num_samples=num_samples, 
                                num_nodes=n_nodes, 
-                               num_dims=n_dims)
+                               num_dims=n_dims,
+                               num_variations= 50)
 
     val_data_loader = torch.utils.data.DataLoader(dataset=val_dataset, 
                                                   batch_size=configs.batch_size,
