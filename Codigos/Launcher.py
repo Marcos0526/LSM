@@ -82,6 +82,14 @@ SCRIPTS = [
         "args":  [],
         "color": g2,
     },
+    {
+        "key":   "4",
+        "name":  "Inferencia Real-Time",
+        "file":  "Inferencia_RealTime.py",
+        "desc":  "Predicción de señas en vivo usando el modelo entrenado",
+        "args":  [],
+        "color": g2,
+    },
 
 ]
 
