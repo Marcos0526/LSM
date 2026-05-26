@@ -1,28 +1,16 @@
 name: LSM
 channels:
   - conda-forge
+  - defaults
 dependencies:
+  - opencv
+  - matplotlib
   - python=3.10
   - numpy
-  - matplotlib
-  - opencv
   - pip
-
-  - pip:
-      - mediapipe==0.10.9
-      - absl-py
-      - attrs
-      - cffi
-      - flatbuffers
-      - fonttools
-      - kiwisolver
-      - contourpy
-      - cycler
-      - packaging
-      - pillow
-      - protobuf
-      - pycparser
-      - pyparsing
-      - python-dateutil
-      - six
-      - sounddevice
+  - pytorch
+  - torchaudio
+  - torchvision
+  - pytorch-cuda=12.1
+  - pillow
+prefix: /home/dracdarktime/miniconda3/envs/LSM

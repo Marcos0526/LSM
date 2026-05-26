@@ -31,7 +31,7 @@ def run(pose_data_root, configs, subset):
                                  num_samples=num_samples, 
                                  num_nodes=n_nodes, 
                                  num_dims=n_dims,
-                                 num_variations=50)
+                                 num_variations=70)
 
     train_data_loader = torch.utils.data.DataLoader(dataset=train_dataset, 
                                                     batch_size=configs.batch_size,
@@ -45,7 +45,7 @@ def run(pose_data_root, configs, subset):
                                num_samples=num_samples, 
                                num_nodes=n_nodes, 
                                num_dims=n_dims,
-                               num_variations=1)
+                               num_variations=10)
 
     val_data_loader = torch.utils.data.DataLoader(dataset=val_dataset, 
                                                   batch_size=configs.batch_size,
@@ -72,11 +72,11 @@ def run(pose_data_root, configs, subset):
     best_test_acc = 0
     
     # Variables para Early Stopping
-    patience = 15
+    patience = 25
     epochs_no_improve = 0
     
     os.makedirs('output', exist_ok=True)
-    checkpoint_dir = os.path.join('checkpoints', subset)
+    checkpoint_dir = os.path.join('Codigos/checkpoints', subset)
     os.makedirs(checkpoint_dir, exist_ok=True)
 
     for epoch in range(int(epochs)):
