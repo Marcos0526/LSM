@@ -38,9 +38,8 @@ Salida en Texto (Transcripción)
 - Marcos Bautista
 - José Ramón García González
 - Angel Ainar Lazcano Sánchez
-
-(Pomgan sus nombres)
-
+- Victor A. Garmendia Fuentes
+- 
 ---
 
 Maestria en Investigacion en ciencia de Datos 
