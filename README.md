@@ -103,3 +103,46 @@ Si algún día deseas desinstalar el ambeinte, porque ocupa espacio puedes hacer
 conda remove -n LSM --all
 ```
 recuerda que siempre podrás recuperarlo gracias a environment.yml
+
+cat << 'ENDOFFILE' >> README.md
+
+---
+
+## 🤖 Módulo LLM - Traducción de Glosas LSM al Español
+
+Este módulo toma las glosas generadas por el modelo de visión y las traduce a oraciones en español natural usando un LLM via Groq API.
+
+### 📁 Estructura de carpetas
+
+    LLM/
+    ├── simulacion_llm.py
+    ├── outputs_vision/
+    │   ├── video_01.txt
+    │   └── ...
+    └── traducciones/
+        ├── video_01_traduccion.txt
+        └── ...
+
+### 📦 Requisitos
+
+    pip install groq
+
+### 🚀 Uso
+
+1. Coloca los archivos .txt con glosas dentro de LLM/outputs_vision/
+2. Ejecuta el script desde dentro de la carpeta LLM/:
+
+    cd LLM
+    python simulacion_llm.py
+
+3. Ingresa tu API Key de Groq cuando se solicite (gsk_...)
+4. Las traducciones se guardarán automáticamente en LLM/traducciones/
+
+### 🔑 Obtener API Key
+
+Regístrate en https://console.groq.com y genera una API Key gratuita.
+
+### 🧠 Modelo utilizado
+
+- llama-3.1-8b-instant via Groq API
+ENDOFFILE

@@ -1,0 +1,4 @@
+Archivo origen : video_02.txt
+Fecha          : 2026-05-26 11:58:38
+Glosas LSM     : YO IR TIENDA MAÑANA COMPRAR LECHE
+Traduccion     : Mañana iré a la tienda a comprar leche.

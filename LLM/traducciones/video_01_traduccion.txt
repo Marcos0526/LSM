@@ -1,0 +1,4 @@
+Archivo origen : video_01.txt
+Fecha          : 2026-05-26 11:58:37
+Glosas LSM     : HOLA COMO ESTAS TU
+Traduccion     : Me alegra verte, ¿cómo estás tú?

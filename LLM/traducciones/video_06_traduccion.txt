@@ -1,0 +1,4 @@
+Archivo origen : video_06.txt
+Fecha          : 2026-05-26 11:58:39
+Glosas LSM     : HOMBRE QUERER APRENDER PROGRAMAR COMPUTADORA
+Traduccion     : Un hombre quiere aprender a programar una computadora.
