@@ -3,14 +3,17 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - opencv
-  - matplotlib
   - python=3.10
   - numpy
+  - matplotlib
+  - pillow
   - pip
   - pytorch
-  - torchaudio
   - torchvision
-  - pytorch-cuda=12.1
-  - pillow
-prefix: /home/dracdarktime/miniconda3/envs/LSM
+  - torchaudio
+  - pip:
+    - jupyter==1.1.1
+    - mediapipe==0.10.9
+    - pandas==2.3.3
+    - opencv-python==4.13.0
+    - scikit-learn==1.7.2
