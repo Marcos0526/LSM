@@ -35,8 +35,9 @@ Salida en Texto (Transcripción)
 
 
 ## Autor
-Marcos Bautista
-José Ramón García González
+- Marcos Bautista
+- José Ramón García González
+- Angel Ainar Lazcano Sánchez
 
 (Pomgan sus nombres)
 
