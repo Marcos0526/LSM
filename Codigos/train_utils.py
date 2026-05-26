@@ -8,6 +8,7 @@ from sklearn.metrics import accuracy_score
 
 def train(log_interval, model, train_loader, optimizer, epoch):
     # set model as training mode
+    model.train() # AÑADIDO: Es una buena práctica asegurar que el modelo está en modo train
     losses = []
     scores = []
     train_labels = []
@@ -26,7 +27,6 @@ def train(log_interval, model, train_loader, optimizer, epoch):
 
         loss = compute_loss(out, y)
 
-        # loss = F.cross_entropy(output, y)
         losses.append(loss.item())
 
         # to compute accuracy
@@ -42,22 +42,13 @@ def train(log_interval, model, train_loader, optimizer, epoch):
 
         loss.backward()
 
-        # torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=6)
-        #
-        # for p in model.parameters():
-        #     param_norm = p.grad.data.norm(2)
-        #     total_norm += param_norm.item() ** 2
-        # total_norm = total_norm ** (1. / 2)
-        #
-        # print(total_norm)
-
         optimizer.step()
 
-        # show information
-        if (batch_idx + 1) % log_interval == 0:
-            print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}, Accu: {:.6f}%'.format(
-                epoch + 1, N_count, len(train_loader.dataset), 100. * (batch_idx + 1) / len(train_loader), loss.item(),
-                100 * step_score))
+        # --- CORRECCIÓN: Silenciamos este print para evitar el spam en la consola ---
+        # if (batch_idx + 1) % log_interval == 0:
+        #     print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}, Accu: {:.6f}%'.format(
+        #         epoch + 1, N_count, len(train_loader.dataset), 100. * (batch_idx + 1) / len(train_loader), loss.item(),
+        #         100 * step_score))
 
     return losses, scores, train_labels, train_preds
 
@@ -121,16 +112,15 @@ def validation(model, test_loader, epoch, save_to):
     top10acc = compute_top_n_accuracy(all_y, all_pool_out, 10)
     top30acc = compute_top_n_accuracy(all_y, all_pool_out, 30)
 
-    # imprimir información
-    print('\nVal. set ({:d} samples): Average loss: {:.4f}, Accuracy: {:.2f}%\n'.format(
-        len(all_y), val_loss, 100 * top1acc))
+    # --- CORRECCIÓN: Silenciamos este print también porque el main.py ya imprime el resumen ---
+    # print('\nVal. set ({:d} samples): Average loss: {:.4f}, Accuracy: {:.2f}%\n'.format(
+    #     len(all_y), val_loss, 100 * top1acc))
 
     return val_loss, [top1acc, top3acc, top5acc, top10acc, top30acc], all_y.tolist(), all_y_pred.tolist(), incorrect_video_ids
+
 def compute_loss(out, gt):
     ce_loss = F.cross_entropy(out, gt)
-
     return ce_loss
-
 
 def compute_top_n_accuracy(truths, preds, n):
     best_n = np.argsort(preds, axis=1)[:, -n:]

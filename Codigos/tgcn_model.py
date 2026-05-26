@@ -125,6 +125,10 @@ class GCN_muti_att(nn.Module):
             y = self.gcbs[i](y)
 
         out = torch.mean(y, dim=1)
+        
+        # ---> AÑADIR DROPOUT AQUÍ <---
+        out = self.do(out) 
+        
         out = self.fc_out(out)
 
         return out

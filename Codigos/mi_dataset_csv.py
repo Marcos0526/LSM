@@ -64,25 +64,28 @@ class MiDatasetLSM(Dataset):
         return len(self.muestras_virtuales)
 
     def aplicar_data_augmentation(self, secuencia):
-        """Aplica UNA variación aleatoria a un solo tensor"""
+        """Aplica variaciones aleatorias independientes a un solo tensor"""
         seq_aug = np.copy(secuencia)
         
-        # 1. Rotación aleatoria en Y
-        theta = np.radians(np.random.uniform(-25, 25))
-        c, s = np.cos(theta), np.sin(theta)
-        Ry = np.array([[c, 0, s], 
-                       [0, 1, 0], 
-                       [-s, 0, c]])
-        seq_aug = np.dot(seq_aug, Ry.T)
+        # 1. Rotación aleatoria en Y (50% de probabilidad)
+        if np.random.rand() > 0.5:
+            theta = np.radians(np.random.uniform(-25, 25))
+            c, s = np.cos(theta), np.sin(theta)
+            Ry = np.array([[c, 0, s], 
+                           [0, 1, 0], 
+                           [-s, 0, c]])
+            seq_aug = np.dot(seq_aug, Ry.T)
         
-        # 2. Escalado espacial
-        scale_factor = np.random.uniform(0.80, 1.20)
-        seq_aug = seq_aug * scale_factor
+        # 2. Escalado espacial (50% de probabilidad)
+        if np.random.rand() > 0.5:
+            scale_factor = np.random.uniform(0.80, 1.20)
+            seq_aug = seq_aug * scale_factor
         
-        # 3. Ruido Gaussiano
-        noise = np.random.normal(0.001, 0.004, seq_aug.shape)
-        seq_aug = seq_aug + noise
-        
+        # 3. Ruido Gaussiano (50% de probabilidad)
+        if np.random.rand() > 0.5:
+            noise = np.random.normal(0.000, 0.003, seq_aug.shape)
+            seq_aug = seq_aug + noise
+            
         return seq_aug
 
     def __getitem__(self, idx):
