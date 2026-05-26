@@ -85,7 +85,10 @@ para poder correr el codigo, las paqueterias junto con sus versiones, procedemos
 ```
 conda env create -f environment.yml
 ```
-
+Por defecto el entorno usa CPU. Si tienes una tarjeta gráfica NVIDIA y quieres procesar el video en tiempo real más rápido, ejecuta este comando después de activar el entorno:
+```
+conda install pytorch torchvision torchaudio pytorch-cuda=12.1 -c pytorch -c nvidia
+```
 Para usar el env que acabamos de crear antes de correr el codigo debes de activarlo de la siguiente manera
 ```
 conda activate LSM
