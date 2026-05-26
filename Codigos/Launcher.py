@@ -179,58 +179,57 @@ def run_script(entry: dict):
 ruta_archivo_actual = os.path.abspath(__file__)
 carpeta_actual = os.path.dirname(ruta_archivo_actual)
 carpeta_padre = os.path.dirname(carpeta_actual)
-ruta_dataset = os.path.join(carpeta_padre, "Dataset")
+ruta_dataset = os.path.join(carpeta_padre, "Dataset/sequences")
 DATASET_DIR = Path(ruta_dataset)
 
 def show_dataset_stats():
     clear()
     sep()
-    print(g2("  ESTADÍSTICAS DEL DATASET"))
+    print(g2("  ESTADÍSTICAS DEL DATASET (Archivos Físicos)"))
     sep()
     print()
 
-    csv_files = list(DATASET_DIR.glob("*.csv"))
-
-    if not csv_files:
-        print(y("  No se encontró ningún archivo .csv en el directorio actual."))
+    if not DATASET_DIR.exists():
+        print(y(f"  No se encontró el directorio del dataset en: {DATASET_DIR}"))
         print()
         pause()
         return
 
-    import csv
-    from collections import Counter
+    clases = [d for d in DATASET_DIR.iterdir() if d.is_dir()]
 
-    for csv_path in csv_files:
-        print(w(f"  {csv_path}"))
-        line("─")
-        counts = Counter()
-        total  = 0
-        try:
-            with open(csv_path, "r") as f:
-                reader = csv.DictReader(f)
-                if "label" not in (reader.fieldnames or []):
-                    print(dim("  (sin columna 'label')"))
-                    continue
-                for row in reader:
-                    counts[row["label"]] += 1
-                    total += 1
-        except Exception as e:
-            print(r(f"  Error leyendo {csv_path}: {e}"))
-            continue
-
-        if not counts:
-            print(dim("  Archivo vacío o sin datos"))
-        else:
-            max_n = max(counts.values())
-            for label, n in sorted(counts.items()):
-                bar_len = int((n / max_n) * 30)
-                bar     = g("█" * bar_len) + dim("░" * (30 - bar_len))
-                pct     = f"{n/total*100:5.1f}%"
-                print(f"    {w(f'{label:<18}')} {bar}  {c(f'{n:>4}')} muestras  {dim(pct)}")
-            print()
-            print(f"  {dim('Total:')}  {g2(str(total))} muestras  ·  {g2(str(len(counts)))} clases")
+    if not clases:
+        print(y(f"  No se encontraron subcarpetas de clases en {DATASET_DIR.name}/"))
         print()
+        pause()
+        return
 
+    counts = {}
+    total = 0
+
+    for clase in clases:
+        if clase.name.startswith('.'):
+            continue
+            
+        num_archivos = len([f for f in clase.iterdir() if f.is_file()])
+        
+        if num_archivos > 0:
+            counts[clase.name] = num_archivos
+            total += num_archivos
+
+    if not counts:
+        print(dim("  Las carpetas están vacías."))
+    else:
+        max_n = max(counts.values())
+        for label, n in sorted(counts.items()):
+            bar_len = int((n / max_n) * 30)
+            bar     = g("█" * bar_len) + dim("░" * (30 - bar_len))
+            pct     = f"{n/total*100:5.1f}%"
+            print(f"    {w(f'{label:<18}')} {bar}  {c(f'{n:>4}')} archivos  {dim(pct)}")
+        
+        print()
+        print(f"  {dim('Total físico:')}  {g2(str(total))} muestras  ·  {g2(str(len(counts)))} clases")
+    
+    print()
     pause()
 
 # ── Loop principal
