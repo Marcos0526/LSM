@@ -15,7 +15,6 @@ def split_dataset(origen_dir, destino_dir, train_ratio=0.9):
     os.makedirs(val_dir, exist_ok=True)
     
     # 2. Obtener todas las carpetas de clases (a, b, hola, etc.)
-    # Ignoramos archivos sueltos, solo buscamos directorios
     clases = [d for d in os.listdir(origen_dir) if os.path.isdir(os.path.join(origen_dir, d))]
     
     if not clases:
@@ -27,6 +26,9 @@ def split_dataset(origen_dir, destino_dir, train_ratio=0.9):
     total_train = 0
     total_val = 0
     
+    # Establecer la semilla una sola vez fuera del bucle para reproducibilidad
+    random.seed(42) 
+    
     # 3. Procesar cada clase individualmente
     for clase in clases:
         ruta_clase_origen = os.path.join(origen_dir, clase)
@@ -37,9 +39,7 @@ def split_dataset(origen_dir, destino_dir, train_ratio=0.9):
         if not archivos:
             continue
             
-        # Mezclar aleatoriamente para evitar sesgos de tiempo 
-        # (ej. si al principio hacías la seña diferente que al final)
-        random.seed(42) # Semilla fija para reproducibilidad (opcional)
+        # Mezclar aleatoriamente para evitar sesgos temporales
         random.shuffle(archivos)
         
         # Calcular el punto exacto de corte (90%)
@@ -57,7 +57,6 @@ def split_dataset(origen_dir, destino_dir, train_ratio=0.9):
         
         # Copiar archivos al conjunto de entrenamiento
         for f in train_archivos:
-            # shutil.copy2 preserva los metadatos originales del archivo (fecha de creación)
             shutil.copy2(os.path.join(ruta_clase_origen, f), os.path.join(ruta_clase_train, f))
             
         # Copiar archivos al conjunto de validación
@@ -78,9 +77,13 @@ def split_dataset(origen_dir, destino_dir, train_ratio=0.9):
     print("¡Proceso completado con éxito!")
 
 if __name__ == "__main__":
-    # Rutas relativas basadas en la estructura de tu proyecto
-    DIRECTORIO_ORIGEN = "../Dataset/sequences" 
-    DIRECTORIO_DESTINO = "../dataset_procesado"
+    # Forma más segura de obtener el directorio padre sin usar os.chdir()
+    ubicacion_actual = os.getcwd()
+    #directorio_padre = os.path.dirname(ubicacion_actual)
+
+    # Se eliminó la barra diagonal (/) al inicio para que el join funcione correctamente
+    DIRECTORIO_ORIGEN = os.path.join(ubicacion_actual, "Dataset", "sequences")
+    DIRECTORIO_DESTINO = os.path.join(ubicacion_actual, "dataset_procesado")
     
     # train_ratio=0.9 indica 90% train, 10% validación
     split_dataset(DIRECTORIO_ORIGEN, DIRECTORIO_DESTINO, train_ratio=0.90)
