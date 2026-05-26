@@ -11,6 +11,6 @@ dependencies:
   - pytorch
   - torchaudio
   - torchvision
-  - pytorch-cuda=12.1
+#  - pytorch-cuda=12.1
   - pillow
 prefix: /home/dracdarktime/miniconda3/envs/LSM
