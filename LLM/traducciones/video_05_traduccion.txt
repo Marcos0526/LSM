@@ -1,0 +1,4 @@
+Archivo origen : video_05.txt
+Fecha          : 2026-05-26 11:58:39
+Glosas LSM     : HOMBRE CAER CALLE TODOS REIR
+Traduccion     : Un hombre cayó en la calle y todos se rieron.

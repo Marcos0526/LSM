@@ -1,0 +1,4 @@
+Archivo origen : video_04.txt
+Fecha          : 2026-05-26 11:58:38
+Glosas LSM     : PERRO COMER MI TAREA ESCUELA
+Traduccion     : Mi tarea de la escuela se la comió un perro.
