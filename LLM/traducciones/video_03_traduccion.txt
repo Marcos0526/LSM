@@ -1,0 +1,4 @@
+Archivo origen : video_03.txt
+Fecha          : 2026-05-26 11:58:38
+Glosas LSM     : YO TENER HAMBRE QUERER TACOS
+Traduccion     : Tengo hambre y quiero comer tacos.
