@@ -17,3 +17,6 @@ dependencies:
     - pandas==2.3.3
     - opencv-python==4.13.0
     - scikit-learn==1.7.2
+#  - pytorch-cuda=12.1
+  - pillow
+prefix: /home/dracdarktime/miniconda3/envs/LSM
