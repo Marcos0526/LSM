@@ -39,7 +39,7 @@ Salida en Texto (Transcripción)
 - José Ramón García González
 - Angel Ainar Lazcano Sánchez
 - Victor A. Garmendia Fuentes
-- 
+- Brenda Rafaela Mones Azcatl
 ---
 
 Maestria en Investigacion en ciencia de Datos 
