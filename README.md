@@ -124,6 +124,42 @@ recuerda que siempre podrás recuperarlo gracias a environment.yml
 cat << 'ENDOFFILE' >> README.md
 
 ---
+### 📄 Arquitectura y Referencias
+
+En este proyecto se implementó la arquitectura de red TGCN (Temporal Graph Convolutional Network) utilizando PyTorch, basándose en el trabajo de Li et al. Toda la definición y lógica principal de esta red neuronal se encuentra encapsulada en el archivo `tgcn_model.py`. El modelo interpreta el conjunto de coordenadas de entrada considerando el cuerpo humano y las manos como un grafo, donde los nodos son los landmarks extraídos en los fotogramas continuos.
+
+**Flujo y Procesamiento (TGCN):**
+El flujo de los datos dentro de `tgcn_model.py` comienza con una capa inicial de convolución en grafos con atención (`GraphConvolution_att`), seguida de un apilamiento de bloques residuales (`GC_Block`). A diferencia de una GCN clásica, esta arquitectura implementa una matriz de atención paramétrica y entrenable (`self.att`) que aprende ponderaciones dinámicas entre los nodos, capturando las relaciones complejas del movimiento sin depender exclusivamente de las conexiones físicas predefinidas. 
+
+Cada bloque residual consta de dos capas de convolución, normalización por lotes (*Batch Normalization*), funciones de activación Tanh y *Dropout* para regularización, una conexión residual (`y + x`) que facilita el flujo del gradiente en capas profundas.
+
+**Data Augmentation:**
+Para garantizar que el modelo generalice de manera robusta y evitar el sobreajuste (*overfitting*), aplicamos técnicas de aumento de datos directamente sobre los tensores. Esta lógica de transformación se encuentra implementada en el archivo `mi_dataset_csv.py`. Durante el proceso, cada secuencia temporal tiene un 50% de probabilidad independiente de sufrir estas modificaciones:
+* **Rotación aleatoria en 3D (eje Y):** Ángulos aleatorios entre -25 y 25 grados para simular cambios de perspectiva de la cámara.
+* **Escalado espacial:** Modificación de la escala entre un 80% y 120% para compensar distancias variables del sujeto.
+* **Ruido Gaussiano:** Inyección de ruido sutil (media 0, desviación 0.003) para emular la incertidumbre y el *jitter* natural de la extracción de landmarks.
+
+**Salida y Entrenamiento:**
+Tras analizar la evolución temporal a través de todos los bloques, la red aplica un agrupamiento global (*Global Average Pooling*) mediante `torch.mean`, colapsando las dimensiones del tensor. Posteriormente pasa por un *Dropout* final y una capa densa (Fully Connected) que proyecta las características a la predicción final de la clase o seña detectada.
+
+Para iniciar el proceso de entrenamiento uniendo el dataset aumentado y la arquitectura descrita, simplemente se debe ejecutar:
+
+```bash
+python train_tgcn.py
+```
+
+**Cita del Artículo:**
+Si desean revisar la fundamentación matemática en la que nos basamos para el uso de convoluciones en secuencias de poses, pueden consultar el trabajo original aquí:
+
+```bibtex
+@inproceedings{li2020transferring,
+  title={Transferring cross-domain knowledge for video sign language recognition},
+  author={Li, Dongxu and Yu, Xin and Xu, Chenchen and Petersson, Lars and Li, Hongdong},
+  booktitle={Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition},
+  pages={6205--6214},
+  year={2020}
+}
+```
 
 ## 🤖 Módulo LLM - Traducción de Glosas LSM al Español
 
