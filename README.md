@@ -40,6 +40,7 @@ Salida en Texto (Transcripción)
 - Angel Ainar Lazcano Sánchez
 - Victor A. Garmendia Fuentes
 - Brenda Rafaela Mones Azcatl
+- Rosario Saldaña de los Santos
 ---
 
 Maestria en Investigacion en ciencia de Datos 
