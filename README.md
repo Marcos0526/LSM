@@ -32,7 +32,20 @@ Modelo de Clasificación
         ↓
 Salida en Texto (Transcripción)
 
+---
+## Construcción de la base de datos
 
+Para la construcción de la base de datos se realizó un proceso de grabación y registro de señas utilizando ambas manos: mano derecha y mano izquierda. La recopilación inició con el alfabeto, registrando las letras correspondientes mediante diferentes participantes. Dentro de este conjunto, algunas letras como **X, Q, K, Z, J y L** se consideran señas con movimiento, por lo que durante su captura fue necesario registrar no solo la posición final de la mano, sino también la trayectoria realizada durante la ejecución de la seña.
+
+Además del alfabeto, también se comenzaron a registrar señas adicionales como **“hola”**, entre otras, con la finalidad de ampliar progresivamente la base de datos más allá de las letras individuales.
+
+La captura de datos fue realizada con la participación de al menos siete personas, lo que permitió obtener variaciones naturales en la forma, posición, velocidad y ejecución de cada seña. Para cada letra o seña registrada se capturaron aproximadamente diez muestras por persona y por mano, generando un conjunto de datos más diverso y útil para el entrenamiento y evaluación del modelo.
+
+El proceso de recopilación de datos se desarrolló utilizando **MediaPipe**, una herramienta de visión por computadora que permite detectar puntos clave del cuerpo humano. En este proyecto se utilizó para identificar y registrar referencias de las **manos, el rostro y el torso**, permitiendo capturar información relevante sobre la postura corporal, la ubicación de las manos y los movimientos realizados durante cada seña.
+
+Las muestras recopiladas fueron organizadas en carpetas de acuerdo con la seña correspondiente y la mano utilizada. Esta estructura facilita la clasificación, el procesamiento posterior y el acceso ordenado a los datos, además de permitir que la base de datos sea escalable para futuras ampliaciones.
+
+Para realizar nuevas grabaciones o ampliar la base de datos, el sistema cuenta con una opción integrada dentro del archivo **`Launcher.py`**. En dicho menú, la recopilación de nuevos datos se encuentra disponible en la **opción 3**, desde donde es posible registrar nuevas señas, agregar más muestras o incorporar nuevos participantes al conjunto de datos.
 
 ## Autor
 - Marcos Bautista
