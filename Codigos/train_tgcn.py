@@ -13,7 +13,6 @@ from train_utils import train, validation
 
 os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
-# AÑADIDO: Pasamos 'subset' como parámetro para evitar errores
 def run(pose_data_root, configs, subset):
     epochs = configs.max_epochs
     log_interval = configs.log_interval
@@ -26,7 +25,6 @@ def run(pose_data_root, configs, subset):
     n_dims = 3    
 
     # setup dataset (Entrenamiento)
-    # CORRECCIÓN: Subimos las variaciones en train para evitar sobreajuste
     train_dataset = MiDatasetLSM(root_dir=os.path.join(pose_data_root, 'train'), 
                                  num_samples=num_samples, 
                                  num_nodes=n_nodes, 
@@ -40,7 +38,6 @@ def run(pose_data_root, configs, subset):
                                                     pin_memory=True)
 
     # setup dataset (Validación)
-    # CORRECCIÓN: Bajamos las variaciones en val (lo ideal es 1 evaluación pura)
     val_dataset = MiDatasetLSM(root_dir=os.path.join(pose_data_root, 'val'), 
                                num_samples=num_samples, 
                                num_nodes=n_nodes, 
@@ -54,12 +51,14 @@ def run(pose_data_root, configs, subset):
     logging.info('\n'.join(['Class labels are: '] + [(str(i) + ' - ' + label) for i, label in
                                                      enumerate(train_dataset.classes_)]))
 
+    # --- MODIFICACIÓN 1: Pasar las clases al modelo ---
     model = GCN_muti_att(input_feature=num_samples * n_dims, 
                          hidden_feature=hidden_size,
                          num_class=len(train_dataset.classes_), 
                          p_dropout=drop_p, 
                          num_stage=num_stages,
-                         num_nodes=n_nodes).cuda()
+                         num_nodes=n_nodes,
+                         classes=train_dataset.classes_).cuda() # <-- AQUÍ AÑADIMOS classes
 
     lr = configs.init_lr
     optimizer = optim.Adam(model.parameters(), lr=lr, eps=configs.adam_eps, weight_decay=configs.adam_weight_decay)
@@ -86,12 +85,9 @@ def run(pose_data_root, configs, subset):
         # Validar
         val_loss, val_score, val_gts, val_preds, incorrect_samples = validation(model, val_data_loader, epoch, save_to=None)
 
-        # Imprimir resumen limpio en consola
-        # NOTA: train_losses suele ser una lista si train() lo devuelve así. Tomamos el promedio.
         avg_train_loss = np.mean(train_losses) if isinstance(train_losses, list) else train_losses
         print(f"Epoch {epoch+1}/{int(epochs)} | Train Loss: {avg_train_loss:.4f} | Val Loss: {val_loss:.4f} | Val Acc: {100 * val_score[0]:.2f}%")
 
-        # Logging tradicional
         logging.info('Epoch: {} Average loss: {:.4f} | Top-1 acc: {:.4f}'.format(epoch, val_loss, 100 * val_score[0]))
         
         epoch_train_losses.append(train_losses)
@@ -99,23 +95,29 @@ def run(pose_data_root, configs, subset):
         epoch_val_losses.append(val_loss)
         epoch_val_scores.append(val_score[0])
 
-        # Guardado del mejor modelo
+        # --- MODIFICACIÓN 2: Guardar el diccionario completo ---
         if val_score[0] > best_test_acc:
             best_test_acc = val_score[0]
-            epochs_no_improve = 0 # Reiniciamos el contador
+            epochs_no_improve = 0 
             ruta_best_model = os.path.join(checkpoint_dir, 'best_model.pth')
-            torch.save(model.state_dict(), ruta_best_model)
+            
+            # Crear diccionario con pesos y clases
+            checkpoint = {
+                'state_dict': model.state_dict(),
+                'classes': model.classes
+            }
+            # Guardar el diccionario en lugar de solo el state_dict
+            torch.save(checkpoint, ruta_best_model)
+            
             print(f"¡Nuevo mejor modelo! Guardado con precisión {best_test_acc:.4f}")
         else:
             epochs_no_improve += 1
             print(f"Sin mejora desde hace {epochs_no_improve} épocas.")
 
-        # Condición de Early Stopping
         if epochs_no_improve >= patience:
             print(f"Early stopping activado en la época {epoch+1}. El modelo dejó de mejorar.")
             break
 
-    # Guardar numpy arrays y matrices al final
     np.save('output/epoch_training_losses.npy', np.array(epoch_train_losses))
     np.save('output/epoch_test_score.npy', np.array(epoch_val_scores))
     
@@ -141,6 +143,5 @@ if __name__ == "__main__":
     )
 
     logging.info('Calling main.run()')
-    # AÑADIDO: Ahora enviamos subset
     run(pose_data_root=pose_data_root, configs=configs, subset=subset)
     logging.info('Finished main.run()')

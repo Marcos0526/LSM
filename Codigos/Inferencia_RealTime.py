@@ -4,7 +4,7 @@ import numpy as np
 import mediapipe as mp
 from tgcn_model import GCN_muti_att
 from configs import Config
-from mi_dataset_csv import MiDatasetLSM 
+# from mi_dataset_csv import MiDatasetLSM # (Ya no es estrictamente necesario aquí si no extraes data)
 import os
 import time
 
@@ -22,26 +22,36 @@ n_dims = 3
 hidden_size = configs.hidden_size
 drop_p = configs.drop_p
 num_stages = configs.num_stages
-num_class = 6 
-clases = ['j', 'k', 'l','q', 'x', 'z']
  
 pose_data_root = os.path.join(proyecto_raiz, 'Codigos/Dataset')
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-model = GCN_muti_att(input_feature=num_samples * n_dims, 
-                         hidden_feature=hidden_size,
-                         num_class=num_class, 
-                         p_dropout=drop_p, 
-                         num_stage=num_stages,
-                         num_nodes=n_nodes).cuda()
-
 ruta_pesos = 'checkpoints/asl100/best_model.pth'
-model.load_state_dict(torch.load(ruta_pesos, weights_only=True))
 
-# Desactiva capas como Dropout o BatchNorm para inferencia
+# --- MODIFICACIÓN 1: Carga del Checkpoint Completo ---
+# NOTA: Quitamos weights_only=True porque ahora cargamos un diccionario que contiene strings (las clases)
+print("Cargando checkpoint...")
+checkpoint = torch.load(ruta_pesos, map_location=device, weights_only=False)
+
+# Extraemos las clases que guardamos al entrenar
+clases_guardadas = checkpoint['classes']
+num_class = len(clases_guardadas) 
+
+# Instanciamos el modelo pasándole las clases_guardadas
+model = GCN_muti_att(input_feature=num_samples * n_dims, 
+                     hidden_feature=hidden_size,
+                     num_class=num_class, 
+                     p_dropout=drop_p, 
+                     num_stage=num_stages,
+                     num_nodes=n_nodes,
+                     classes=clases_guardadas) # <-- Pasamos las clases aquí
+
+# Cargamos los pesos (state_dict) desde el diccionario
+model.load_state_dict(checkpoint['state_dict'])
+
 model.eval()
 model.to(device)
-print("✅ Modelo cargado correctamente.")
+print(f"✅ Modelo cargado correctamente con {num_class} clases: {clases_guardadas}")
 
 mp_holistic = mp.solutions.holistic
 holistic = mp_holistic.Holistic(min_detection_confidence=0.7, min_tracking_confidence=0.7)
@@ -156,8 +166,9 @@ while cap.isOpened():
             
             with torch.no_grad():
                 out = model(tensor)
-                idx = torch.argmax(out, dim=1).item()
-                ultima_prediccion = clases[idx] 
+                # --- MODIFICACIÓN 2: Obtener la predicción de texto directamente ---
+                # get_predicted_classes devuelve una lista (ej. ["hola"]), extraemos el índice [0]
+                ultima_prediccion = model.get_predicted_classes(out)[0]
             
             estado = "Pausa"
             tiempo_pausa = time.time()

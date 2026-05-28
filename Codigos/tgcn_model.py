@@ -94,9 +94,17 @@ class GC_Block(nn.Module):
 
 
 class GCN_muti_att(nn.Module):
-    def __init__(self, input_feature, hidden_feature, num_class, p_dropout, num_stage=1, is_resi=True, num_nodes=None):
+    # NUEVO: Añadido el parámetro `classes=None` al constructor
+    def __init__(self, input_feature, hidden_feature, num_class, p_dropout, num_stage=1, is_resi=True, num_nodes=None, classes=None):
         super(GCN_muti_att, self).__init__()
         self.num_stage = num_stage
+        
+        # NUEVO: Guardar las clases. Si no se especifican, se crean índices numéricos por defecto.
+        if classes is not None:
+            assert len(classes) == num_class, f"Error: Esperadas {num_class} clases, pero se recibieron {len(classes)}."
+            self.classes = classes
+        else:
+            self.classes = [str(i) for i in range(num_class)]
 
         # CORRECCIÓN AQUÍ: Pasar num_nodes
         self.gc1 = GraphConvolution_att(input_feature, hidden_feature, num_nodes=num_nodes)
@@ -133,15 +141,34 @@ class GCN_muti_att(nn.Module):
 
         return out
 
+    # NUEVO: Método para traducir la salida numérica a nombres de clases legibles
+    def get_predicted_classes(self, logits):
+        """Devuelve los nombres de las clases predecidas basados en la salida del modelo (logits)"""
+        _, predicted_indices = torch.max(logits, 1)
+        return [self.classes[idx] for idx in predicted_indices]
+
 
 if __name__ == '__main__':
     num_samples = 32
-    # CORRECCIÓN AQUÍ: Definir la variable num_nodes para el testeo
     n_nodes = 75 # Pon aquí el número de puntos que usarás realmente (ej. 75)
-
-    model = GCN_muti_att(input_feature=num_samples*2, hidden_feature=256,
-                         num_class=100, p_dropout=0.3, num_stage=2, num_nodes=n_nodes)
     
-    # CORRECCIÓN AQUÍ: Usar la variable que acabamos de definir
+    # NUEVO: Definir nuestras clases en formato lista
+    nombres_de_clases = ["a", "b", "c"]
+    num_classes = len(nombres_de_clases) # En este ejemplo son 3
+
+    # NUEVO: Le pasamos 'classes=nombres_de_clases' y ajustamos 'num_class'
+    model = GCN_muti_att(input_feature=num_samples*2, hidden_feature=256,
+                         num_class=num_classes, p_dropout=0.3, num_stage=2, 
+                         num_nodes=n_nodes, classes=nombres_de_clases)
+    
     x = torch.ones([2, n_nodes, num_samples*2])
-    print(model(x).size())
+    salida = model(x)
+    
+    print("Formato de salida:", salida.size())
+    
+    # Imprimir las clases guardadas en estilo ["a", "b", "c"]
+    print("Clases guardadas en el modelo:", model.classes)
+    
+    # Probar la predicción usando la nueva función
+    predicciones = model.get_predicted_classes(salida)
+    print("Predicción para cada muestra del batch:", predicciones)
