@@ -54,6 +54,9 @@ Para realizar nuevas grabaciones o ampliar la base de datos, el sistema cuenta c
 - Victor A. Garmendia Fuentes
 - Brenda Rafaela Mones Azcatl
 - Rosario Saldaña de los Santos
+- Ailín Atala Beltrán Guzmán
+- Erick Michel Meza Mendoza
+- Raúl Badillo Lora
 ---
 
 Maestria en Investigacion en ciencia de Datos 
